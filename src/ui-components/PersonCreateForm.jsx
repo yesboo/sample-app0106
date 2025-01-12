@@ -25,18 +25,26 @@ export default function PersonCreateForm(props) {
   const initialValues = {
     name: "",
     email: "",
+    age: "",
+    tel: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [email, setEmail] = React.useState(initialValues.email);
+  const [age, setAge] = React.useState(initialValues.age);
+  const [tel, setTel] = React.useState(initialValues.tel);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setName(initialValues.name);
     setEmail(initialValues.email);
+    setAge(initialValues.age);
+    setTel(initialValues.tel);
     setErrors({});
   };
   const validations = {
     name: [{ type: "Required" }],
     email: [{ type: "Email" }],
+    age: [],
+    tel: [{ type: "Phone" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -66,6 +74,8 @@ export default function PersonCreateForm(props) {
         let modelFields = {
           name,
           email,
+          age,
+          tel,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -130,6 +140,8 @@ export default function PersonCreateForm(props) {
             const modelFields = {
               name: value,
               email,
+              age,
+              tel,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -155,6 +167,8 @@ export default function PersonCreateForm(props) {
             const modelFields = {
               name,
               email: value,
+              age,
+              tel,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -168,6 +182,65 @@ export default function PersonCreateForm(props) {
         errorMessage={errors.email?.errorMessage}
         hasError={errors.email?.hasError}
         {...getOverrideProps(overrides, "email")}
+      ></TextField>
+      <TextField
+        label="Age"
+        isRequired={false}
+        isReadOnly={false}
+        type="number"
+        step="any"
+        value={age}
+        onChange={(e) => {
+          let value = isNaN(parseInt(e.target.value))
+            ? e.target.value
+            : parseInt(e.target.value);
+          if (onChange) {
+            const modelFields = {
+              name,
+              email,
+              age: value,
+              tel,
+            };
+            const result = onChange(modelFields);
+            value = result?.age ?? value;
+          }
+          if (errors.age?.hasError) {
+            runValidationTasks("age", value);
+          }
+          setAge(value);
+        }}
+        onBlur={() => runValidationTasks("age", age)}
+        errorMessage={errors.age?.errorMessage}
+        hasError={errors.age?.hasError}
+        {...getOverrideProps(overrides, "age")}
+      ></TextField>
+      <TextField
+        label="Tel"
+        isRequired={false}
+        isReadOnly={false}
+        type="tel"
+        value={tel}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              email,
+              age,
+              tel: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.tel ?? value;
+          }
+          if (errors.tel?.hasError) {
+            runValidationTasks("tel", value);
+          }
+          setTel(value);
+        }}
+        onBlur={() => runValidationTasks("tel", tel)}
+        errorMessage={errors.tel?.errorMessage}
+        hasError={errors.tel?.hasError}
+        {...getOverrideProps(overrides, "tel")}
       ></TextField>
       <Flex
         justifyContent="space-between"
