@@ -1,0 +1,73 @@
+create 
+
+import { generateClient } from "aws-amplify/api";
+import { createPerson } from './graphql/mutations';
+
+const client = generateClient()
+
+
+const newPerson = await client.graphql({
+    query: createPerson,
+    variables: {
+        input: {
+		"name": "Lorem ipsum dolor sit amet",
+		"email": "test12346789@testemailtestemail.com",
+		"Boards": []
+	}
+    }
+});
+
+
+update
+
+import { generateClient } from "aws-amplify/api";
+import { updatePerson } from './graphql/mutations';
+
+const client = generateClient()
+
+const updatedPerson = await client.graphql({
+    query: updatePerson,
+    variables: {
+        input: {
+		"name": "Lorem ipsum dolor sit amet",
+		"email": "test12346789@testemailtestemail.com",
+		"Boards": []
+	}
+    }
+});
+
+
+delete
+
+import { generateClient } from "aws-amplify/api";
+import { deletePerson } from './graphql/mutations';
+
+const client = generateClient()
+
+const deletedPerson = await client.graphql({
+    query: deletePerson,
+    variables: {
+        input: {
+            id: "YOUR_RECORD_ID"
+        }
+    }
+});
+
+select
+
+import { generateClient } from "aws-amplify/api";
+import { listPersons, getPerson } from "./graphql/queries";
+
+const client = generateClient()
+
+// List all items
+const allPersons = await client.graphql({
+    query: listPersons
+});
+console.log(allPerson);
+
+// Get a specific item
+const onePerson = await client.graphql({
+    query: getPerson,
+    variables: { id: 'YOUR_RECORD_ID' }
+});
