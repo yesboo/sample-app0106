@@ -1,8 +1,6 @@
 
 import './App.css';
 import '@aws-amplify/ui-react/styles.css';
-import { Amplify } from 'aws-amplify';
-import { withAuthenticator } from '@aws-amplify/ui-react';
 import { Header } from './ui-components';
 
 function App() {
@@ -10,21 +8,21 @@ function App() {
     <div className="py-4">
       <Header className="mb-4" />
       <p>※これは、UIコンポーネントを利用した表示です。</p>
-      <Hello />
+      <Hello message = "サンプルメッセージです。" type="primary"/>
+      <Hello message = "表示タイプも変更か。" type="dark"/>
       <Now />
+      <button className= "btn btn-primary" onClick={onClick} > Click me!!</button>
     </div>
   );
 }
 
-
-function Hello() {
+function Hello(props) {
   return (
-    <p className="border border-primary p-3 my-3">
-      こんにちは！
+    <p className= {"alert alert-" + props.type}>
+      {props.message }
     </p>
   );
 }
-
 
 function Now() {
   return (
@@ -36,4 +34,8 @@ function Now() {
   );
 }
 
-export default withAuthenticator(App);
+function onClick(){
+  alert("クリックした。");
+}
+
+export default App;
