@@ -2,8 +2,16 @@
 import './App.css';
 import '@aws-amplify/ui-react/styles.css';
 import { Header } from './ui-components';
+import { useState } from "react";
+
 
 function App() {
+  const [count, setCount] = useState(0);
+
+  const onClick = () =>{
+    setCount(count + 1);
+  }
+
   return (
     <div className="py-4">
       <Header className="mb-4" />
@@ -11,6 +19,7 @@ function App() {
       <Hello message = "サンプルメッセージです。" type="primary"/>
       <Hello message = "表示タイプも変更か。" type="dark"/>
       <Now />
+      <div className ="alert alert-primary">Count : {count} </div>
       <button className= "btn btn-primary" onClick={onClick} > Click me!!</button>
     </div>
   );
@@ -34,8 +43,8 @@ function Now() {
   );
 }
 
-function onClick(){
-  alert("クリックした。");
-}
+//function onClick(){
+//  alert("クリックした。");
+//}
 
 export default App;
