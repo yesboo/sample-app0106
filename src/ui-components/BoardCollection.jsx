@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { listBoards } from "../../queries";
+import { listBoards } from "../graphql/queries";
 import Board from "./Board";
 import { getOverrideProps } from "./utils";
 import { Collection, Pagination, Placeholder } from "@aws-amplify/ui-react";

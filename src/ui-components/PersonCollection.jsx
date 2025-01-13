@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { listPeople } from "../../queries";
+import { listPeople } from "../graphql/queries";
 import Person from "./Person";
 import { getOverrideProps } from "./utils";
 import { Collection, Pagination, Placeholder } from "@aws-amplify/ui-react";

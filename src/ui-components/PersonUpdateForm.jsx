@@ -9,8 +9,8 @@ import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
-import { getPerson } from "../../queries";
-import { updatePerson } from "../../mutations";
+import { getPerson } from "../graphql/queries";
+import { updatePerson } from "../graphql/mutations";
 const client = generateClient();
 export default function PersonUpdateForm(props) {
   const {
