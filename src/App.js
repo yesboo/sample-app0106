@@ -2,11 +2,12 @@
 import './App.css';
 import '@aws-amplify/ui-react/styles.css';
 import { Header } from './ui-components';
-import { Amplify, Auth } from 'aws-amplify';  // 修正
+import { Amplify } from 'aws-amplify';  // 修正
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import aws_exports from './aws-exports';
+import { BoardCollection } from "./ui-components";
 
-const content1 = <p>タブ1のコンテンツ</p>;  // ①
+const content1 = <BoardCollection />
 const content2 = <p>タブ2のコンテンツ</p>;  // ②
 const content3 = <p>タブ3のコンテンツ</p>;  // ③
 const content4 = <p>タブ4のコンテンツ</p>;  // ④
