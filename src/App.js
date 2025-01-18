@@ -1,19 +1,46 @@
-
 import './App.css';
 import '@aws-amplify/ui-react/styles.css';
-import { Header } from './ui-components';
-import { Amplify } from 'aws-amplify';  // 修正
+import { useState, useEffect } from 'react';
 import { withAuthenticator } from '@aws-amplify/ui-react';
+import { Header } from "./ui-components";
+import { DataStore } from 'aws-amplify/datastore';
+import { Board } from './models';
+import { Amplify } from 'aws-amplify';  // 修正
 import aws_exports from './aws-exports';
-import { BoardCollection } from "./ui-components";
+import { generateClient } from "aws-amplify/api";
+import { listBoards, getBoard } from "./graphql/queries";
 
-const content1 = <BoardCollection />
-const content2 = <p>タブ2のコンテンツ</p>;  // ②
-const content3 = <p>タブ3のコンテンツ</p>;  // ③
-const content4 = <p>タブ4のコンテンツ</p>;  // ④
+const content2 = <p>タブ2のコンテンツ</p>;
+const content3 = <p>タブ3のコンテンツ</p>;
+const content4 = <p>タブ4のコンテンツ</p>;
+
 Amplify.configure(aws_exports);
 
 function App() {
+  const [content1, setContent1] = useState(); //①タブ1の表示
+  const client = generateClient();
+
+  useEffect(() => {
+    async function syncModels() {
+      const allBoards = await client.graphql({
+        query: listBoards
+      });
+    
+      const data = [];
+      for (let i = 0; i < allBoards.data.listBoards.items.length; i++) {
+        const item = allBoards.data.listBoards.items[i];
+        data.push(
+          <li key={item.id} className="list-group-item">
+            {item.message} ({item.name})
+          </li>
+          );
+      }
+      setContent1(<ol className="my-3 list-group">{data}</ol>);
+    }
+
+    syncModels();
+  }, []);
+
   return (
     <div className="py-4">
       <Header className="mb-4" />
