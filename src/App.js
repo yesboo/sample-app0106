@@ -3,12 +3,12 @@ import '@aws-amplify/ui-react/styles.css';
 import { useState, useEffect } from 'react';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import { Header } from "./ui-components";
-import { DataStore } from 'aws-amplify/datastore';
 import { Board } from './models';
 import { Amplify } from 'aws-amplify';  // 修正
 import aws_exports from './aws-exports';
 import { generateClient } from "aws-amplify/api";
 import { listBoards, getBoard } from "./graphql/queries";
+import BoardComponent from './ui-components/Board';
 
 const content2 = <p>タブ2のコンテンツ</p>;
 const content3 = <p>タブ3のコンテンツ</p>;
@@ -30,12 +30,10 @@ function App() {
       for (let i = 0; i < allBoards.data.listBoards.items.length; i++) {
         const item = allBoards.data.listBoards.items[i];
         data.push(
-          <li key={item.id} className="list-group-item">
-            {item.message} ({item.name})
-          </li>
-          );
+          <BoardComponent board={item} key={item.id} className="list-group-item" />
+        );
       }
-      setContent1(<ol className="my-3 list-group">{data}</ol>);
+      setContent1(<div className="my-3 list-group">{data}</div>);
     }
 
     syncModels();
