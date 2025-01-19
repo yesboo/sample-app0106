@@ -51,6 +51,25 @@ export const getBoard = /* GraphQL */ `
     }
   }
 `;
+export const listBoardsByName = /* GraphQL */ `
+  query ListBoardsByName($name: String) {
+    listBoards(filter: { name: { contains: $name } }) {
+      items {
+        id
+        message
+        name
+        image
+        personID
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+
 export const listBoards = /* GraphQL */ `
   query ListBoards(
     $filter: ModelBoardFilterInput

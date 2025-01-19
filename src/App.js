@@ -3,11 +3,10 @@ import '@aws-amplify/ui-react/styles.css';
 import { useState, useEffect } from 'react';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import { Header } from "./ui-components";
-import { Board } from './models';
 import { Amplify } from 'aws-amplify';  // 修正
 import aws_exports from './aws-exports';
 import { generateClient } from "aws-amplify/api";
-import { listBoards, getBoard } from "./graphql/queries";
+import { listBoards, listBoardsByName } from "./graphql/queries";
 import BoardComponent from './ui-components/Board';
 
 const content2 = <p>タブ2のコンテンツ</p>;
@@ -19,25 +18,48 @@ Amplify.configure(aws_exports);
 function App() {
   const [content1, setContent1] = useState(); //①タブ1の表示
   const client = generateClient();
+  const [input, setInput] = useState("");
+  const [find, setFind] = useState(input);
+  //Listタブ用イベント関数
+  const doChange = (event) => {
+    setInput(event.target.value);
+  }
+  const doFilter = (event) => {
+    setFind(input);
+  }
 
   useEffect(() => {
     async function syncModels() {
-      const allBoards = await client.graphql({
-        query: listBoards
-      });
-    
+      let resultBoards;
+      if (find == ""){
+        resultBoards = await client.graphql({
+          query: listBoards
+        });
+      }
+      else{
+        resultBoards = await client.graphql({
+          query: listBoardsByName,
+          variables: { name: find }
+        });        
+      }
       const data = [];
-      for (let i = 0; i < allBoards.data.listBoards.items.length; i++) {
-        const item = allBoards.data.listBoards.items[i];
+      for (let i = 0; i < resultBoards.data.listBoards.items.length; i++) {
+        const item = resultBoards.data.listBoards.items[i];
         data.push(
           <BoardComponent board={item} key={item.id} className="list-group-item" />
         );
       }
-      setContent1(<div className="my-3 list-group">{data}</div>);
-    }
-
+      setContent1(
+        <div>
+          <div className="mx-0 my-3 row">
+            <input type="text" className="form-control col" onChange={doChange} />
+            <button className="btn btn-primary col-2" onClick={doFilter}>Click</button>
+          </div>
+          {data}
+        </div>
+    )};
     syncModels();
-  }, []);
+  }, [input, find]);
 
   return (
     <div className="py-4">
