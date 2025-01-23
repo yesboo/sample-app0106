@@ -6,7 +6,7 @@ import { Header } from "./ui-components";
 import { Amplify } from 'aws-amplify';  // 修正
 import aws_exports from './aws-exports';
 import { generateClient } from "aws-amplify/api";
-import { listBoards, listBoardsByPartialNameOrMessage } from "./graphql/queries";
+import { listBoards, listBoardsByPartialNameOrMessage, getPerson } from "./graphql/queries";
 import BoardComponent from './ui-components/Board';
 
 const content2 = <p>タブ2のコンテンツ</p>;
@@ -46,10 +46,21 @@ function App() {
         }
 
         const data = [];
+        let gotPerson;
         for (let i = 0; i < resultBoards.data.listBoards.items.length; i++) {
+          //personからメアドを取得
+          gotPerson = await client.graphql({
+            query: getPerson,
+            //idを使った検索
+            variables: { id: resultBoards.data.listBoards.items[i].personID } // idを使った検索
+          });
           const item = resultBoards.data.listBoards.items[i];
+          const emailAddress = gotPerson.data.getPerson.email;
           data.push(
-            <BoardComponent board={item} key={item.id} className="list-group-item" />
+            <div key={item.id}>
+              <BoardComponent board={item} key={item.id} className="list-group-item" />
+              <p className="text-end">posted by {emailAddress}</p>
+            </div>
           );
         }
         setContent1(
