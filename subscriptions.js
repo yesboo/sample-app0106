@@ -11,6 +11,8 @@ export const onCreatePerson = /* GraphQL */ `
         nextToken
         __typename
       }
+      age
+      tel
       createdAt
       updatedAt
       __typename
@@ -27,6 +29,8 @@ export const onUpdatePerson = /* GraphQL */ `
         nextToken
         __typename
       }
+      age
+      tel
       createdAt
       updatedAt
       __typename
@@ -43,6 +47,8 @@ export const onDeletePerson = /* GraphQL */ `
         nextToken
         __typename
       }
+      age
+      tel
       createdAt
       updatedAt
       __typename

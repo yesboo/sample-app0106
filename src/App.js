@@ -6,10 +6,10 @@ import { Header } from "./ui-components";
 import { Amplify } from 'aws-amplify';  // 修正
 import aws_exports from './aws-exports';
 import { generateClient } from "aws-amplify/api";
-import { listBoards, listBoardsByPartialNameOrMessage, getPerson } from "./graphql/queries";
+import { listBoards, listBoardsByPartialNameOrMessage, getPerson, getPersonByEmail } from "./graphql/queries";
+import { createBoard } from "./graphql/mutations";
 import BoardComponent from './ui-components/Board';
 
-const content2 = <p>タブ2のコンテンツ</p>;
 const content3 = <p>タブ3のコンテンツ</p>;
 const content4 = <p>タブ4のコンテンツ</p>;
 
@@ -82,6 +82,95 @@ function App() {
 
     syncModels();
   }, [input, find]);
+
+  const [content2, setContent2] = useState("");
+  const [fmsg, setFmsg] = useState("");
+  const [femail, setFemail] = useState("");
+  const [fimg, setFimg] = useState("");
+
+  useEffect(()=> {
+    func2(setContent2,fmsg,femail,fimg,setFmsg,setFemail,setFimg);
+  },[fmsg,femail,fimg]);
+
+  async function func2(setContent2,fmsg,femail,fimg,setFmsg,setFemail,setFimg) {
+    const onEmailChange = (event)=> {
+      const v = event.target.value;
+      setFemail(v);
+    }
+    const onMsgChange = (event)=> {
+      const v = event.target.value;
+     setFmsg(v);
+    }
+    const onImgChange = (event)=> {
+      const v = event.target.value;
+      setFimg(v);
+    }
+    
+    const onClick = async ()=> {
+      try{
+        const result = await client.graphql({
+          query: getPersonByEmail,
+          //emailを使った検索
+          variables: { email: femail} // emailを使った検索
+        });
+        const personInfo = result.data.getPersonByEmail.items;
+        if (personInfo.length > 0) {
+          const personName = personInfo[0].name;
+          const personId = personInfo[0].id
+          const newBoard = await client.graphql({
+            query: createBoard,
+            variables: {
+                input: {
+                  message:fmsg,
+                  name: personName,
+                  image:fimg == "" ? null : fimg,
+                  personID: personId
+                }
+            }  
+          });
+        }else{
+          alert("メールアドレスが見つかりません");
+        }
+        alert("保尊しました");
+      }
+      catch (error) {
+        console.error("Error syncing models:", error);
+        if (error && error.errors && error.errors.length > 0) {
+          error.errors.forEach(err => console.error(err.message));
+        }
+      }
+    }
+    
+    setContent2(
+      <div>
+        <h3>Create new Board:</h3>
+        <div className="alert alert-primary my-3">
+          <div className="mb-2">
+            <label htmlFor="add_message" className="col-form-label">
+              Message</label>
+            <input type="text" className="form-control"
+              id="add_message" onChange={onMsgChange}/>
+          </div>
+          <div className="mb-2">
+            <label htmlFor="add_email" className="col-form-label">
+              Email</label>
+            <input type="text" className="form-control"
+              id="add_email" onChange={onEmailChange}/>
+          </div>
+          <div className="mb-2">
+            <label htmlFor="add_image" className="col-form-label">
+              Image(URL)</label>
+            <input type="text" className="form-control" 
+              id="add_image" onChange={onImgChange}/>
+          </div>
+          <div className="mb-2 text-center">
+            <button className="btn btn-primary" onClick={onClick}>
+              Click</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-4">

@@ -17,6 +17,36 @@ export const getPerson = /* GraphQL */ `
     }
   }
 `;
+export const getPersonByEmail = /* GraphQL */ `
+  query GetPersonByEmail(
+    $email: AWSEmail!
+    $sortDirection: ModelSortDirection
+    $filter: ModelPersonFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    getPersonByEmail(
+      email: $email
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        email
+        age
+        tel
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const listPeople = /* GraphQL */ `
   query ListPeople(
     $filter: ModelPersonFilterInput

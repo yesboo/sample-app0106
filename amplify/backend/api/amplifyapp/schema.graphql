@@ -1,7 +1,7 @@
 type Person @model @auth(rules: [{allow: public}]) {
-  id: ID!
+  id: ID! @primaryKey
   name: String!
-  email: AWSEmail
+  email: AWSEmail @index(name: "byEmail", queryField: "getPersonByEmail")
   Boards: [Board] @hasMany(indexName: "byPerson", fields: ["id"])
   age: Int
   tel: AWSPhone
@@ -14,4 +14,5 @@ type Board @model @auth(rules: [{allow: public}]) {
   image: String
   personID: ID! @index(name: "byPerson")
 }
- 
+
+
