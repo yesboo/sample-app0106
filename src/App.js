@@ -6,16 +6,14 @@ import { Header } from "./ui-components";
 import { Amplify } from 'aws-amplify';  // 修正
 import aws_exports from './aws-exports';
 import { generateClient } from "aws-amplify/api";
-import { listBoards, listBoardsByPartialNameOrMessage, getPerson, getPersonByEmail } from "./graphql/queries";
-import { createBoard } from "./graphql/mutations";
+import { listBoards, listBoardsByPartialNameOrMessage, getPerson, getPersonByEmail, getBoard } from "./graphql/queries";
+import { createBoard, updateBoard, deleteBoard } from "./graphql/mutations";
 import BoardComponent from './ui-components/Board';
-
-const content3 = <p>タブ3のコンテンツ</p>;
-const content4 = <p>タブ4のコンテンツ</p>;
 
 Amplify.configure(aws_exports);
 
 function App() {
+  //リストタブ
   const [content1, setContent1] = useState(); //①タブ1の表示
   const client = generateClient();
   const [input, setInput] = useState("");
@@ -83,6 +81,7 @@ function App() {
     syncModels();
   }, [input, find]);
 
+  //createタブ
   const [content2, setContent2] = useState("");
   const [fmsg, setFmsg] = useState("");
   const [femail, setFemail] = useState("");
@@ -170,6 +169,207 @@ function App() {
         </div>
       </div>
     );
+  }
+
+  //Updateタブ
+  const [content3, setContent3] = useState("");
+  const [umsg, setUmsg] = useState("");
+  const [uimg, setUimg] = useState("");
+  const [seldata, setSeldata] = useState([]);
+  const [selbrd, setSelbrd] = useState(null);
+
+  useEffect(()=> {
+    func3(setContent3,seldata,setSeldata,umsg,uimg,setUmsg,setUimg,selbrd,setSelbrd);
+  },[content1,umsg,uimg,selbrd,seldata]);
+
+  async function func3(setContent3,seldata,setSeldata,umsg,uimg,setUmsg,setUimg,selbrd,setSelbrd) {
+    const onUMsgChange = (event)=> {
+      const v = event.target.value;
+      setUmsg(v);
+    }
+    const onUImgChange = (event)=> {
+      const v = event.target.value;
+      setUimg(v);
+    }
+    const onSelChange = async (event)=> {
+      const v = event.target.value;
+      //<option>のvalue属性は、Boardのidを格納している
+      try{
+        const gotBoard = await client.graphql({
+          query: getBoard,
+          variables : { id: v}
+        });
+        setSelbrd(gotBoard.data.getBoard);
+        setUmsg(gotBoard.data.getBoard.message);
+        setUimg(gotBoard.data.image);
+
+      }catch(err){
+        alert("見つかりませんでした。");
+        return;
+      }
+    }
+    
+    const UpdClick =  async ()=> {
+      try{
+        const updBoard = await client.graphql({
+          query: updateBoard,
+          variables: {
+            input: {
+              id: selbrd.id,      // 更新するボードのID
+              message: umsg,      // 更新するメッセージ
+              image: uimg         // 更新する画像URL
+            }
+          }
+        });
+        alert("メッセージを更新しました。");
+      }catch(err){
+        alert("メッセージ更新に失敗しました。");
+      }
+    }
+    
+    //ボードのメッセージを表示
+    const optionData = [
+      <option key="nodata" vaue="-">-</option>
+    ];
+    try{
+      const resultBoards = await client.graphql({
+        query: listBoards,
+        variables: { filter: null, limit: 5 }
+      });
+
+      // 取得したボードのリストを `createdAt` で最新順にソート
+      const sortedBoards = resultBoards.data.listBoards.items.sort((a, b) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+      //ソートしたボードアイテムを表示
+      for(let item of sortedBoards) {
+        optionData.push(
+          <option key={item.id} value={item.id}>{item.message}</option>
+        );
+      }
+      //フックを発動
+      setSeldata(optionData);
+    }catch(error){
+      console.error("Error fetching boards:", error);
+      if (error.errors && error.errors.length > 0) {
+        error.errors.forEach(err => console.error(err.message));
+      }
+    }
+
+    setContent3(
+      <div>
+        <h3>Update new Board:</h3>
+        <select className="form-select" onChange={onSelChange}>
+          {seldata}
+        </select>
+        <div className="alert alert-primary my-3">
+          <div className="mb-2">
+            <label htmlFor="edit_message" className="col-form-label">
+              Message</label>
+            <input type="text" className="form-control" value={umsg}
+              id="edit_message" onChange={onUMsgChange}/>
+          </div>
+          <div className="mb-2">
+            <label htmlFor="edit_image" className="col-form-label">
+              Image(URL)</label>
+            <input type="text" className="form-control" value={uimg}
+              id="edit_image" onChange={onUImgChange}/>
+          </div>
+          <div className="mb-2 text-center">
+            <button className="btn btn-primary" onClick={UpdClick}>
+              Click</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  //delete
+  const [content4, setContent4] = useState("");
+  const [deldata, setDeldata] = useState([]);
+  const [delbrd, setDelbrd] = useState(null);
+  
+  useEffect(()=> {
+    func4(setContent4,deldata,setDeldata,delbrd,setDelbrd);
+  },[content1,delbrd,deldata]);
+  
+  async function func4(setContent4,deldata,setDeldata,delbrd,setDelbrd) {
+    const onDelChange = async (event)=> {
+      const v = event.target.value;
+      //<option>のvalue属性は、Boardのidを格納している
+      try{
+        const gotBoard = await client.graphql({
+          query: getBoard,
+          variables : { id: v}
+        });
+        
+        if (!gotBoard.data.getBoard) {
+          alert("見つかりませんでした。");
+          return;
+        }
+        setDelbrd(gotBoard.data.getBoard);
+      }catch(err){
+        alert("見つかりませんでした。");
+        return;
+      }
+    }
+    
+    const delClick = async ()=> {
+      try {
+        await client.graphql({
+          query: deleteBoard,
+          variables: {
+            input: { id: delbrd.id }
+          }
+        });
+        alert("削除されました。");
+        
+        // 更新されたデータを取得し、削除後のリストを表示
+        const data = await getAllBoard();    
+        setDeldata(data);
+      } catch (err) {
+        alert("削除に失敗しました。");
+      }
+    }
+    const data = await getAllBoard();    
+    setDeldata(data);
+    if(!data){
+      alert("なんか失敗");
+    }  
+
+    setContent4(
+      <div>
+        <h3>Delete Board:</h3>
+        <select className="form-select" onChange={onDelChange}>
+          {deldata}
+        </select>
+        <div className="my-2 text-center">
+          <button className="btn btn-primary" onClick={delClick}>
+            Click</button>
+        </div>
+      </div>
+    );
+  }
+  
+  async function getAllBoard(){
+    const data = [
+      <option key="nodata" vaue="-">-</option>
+    ];
+    try{
+      const resultBoards = await client.graphql({
+        query: listBoards
+      });
+
+      for(let item of resultBoards.data.listBoards.items) {
+        data.push(
+          <option key={item.id} value={item.id}>{item.message}</option>
+        );
+      }
+      return data;
+    }
+    catch(err){
+      return ;
+    }
   }
 
   return (
