@@ -72,17 +72,22 @@ const Other = () => {
       setCredentials(items);
     };
 
-    const api_url = "https://vouopayma5.execute-api.ap-northeast-1.amazonaws.com/default/ampLambda-dev";
+//    const api_url = "https://vouopayma5.execute-api.ap-northeast-1.amazonaws.com/default/ampLambda-dev";
+    const api_url = "https://yy49fcsalh.execute-api.ap-northeast-1.amazonaws.com/default/getListFromS3-dev";
     const runLambda = () => {
       try {
         fetch(api_url)
           .then(resp => resp.json())
           .then(result => {
             const data = [];
-            for (let item of result.Items){
+            for(let item of result.Contents) {
+              const path = item.Key.split('/');
+              const fname = path[path.length - 1] == '' 
+                ? path[path.length - 2] + '/' 
+                : path[path.length - 1];
               data.push(
-                <li key={item.id} className="list-group-item">
-                  {item.message}({item.name});
+                <li key={item.Key} className="list-group-item">
+                  {fname}（size:{item.Size}）
                 </li>
               );
             }

@@ -25,6 +25,10 @@
         "ampLambda": {
           "deploymentBucketName": "amplify-amplifyapp-dev-e0bad-deployment",
           "s3Key": "amplify-builds/ampLambda-374b6558384172364242-build.zip"
+        },
+        "getListFromS3": {
+          "deploymentBucketName": "amplify-amplifyapp-dev-e0bad-deployment",
+          "s3Key": "amplify-builds/getListFromS3-716e76656841766d4544-build.zip"
         }
       }
     }
