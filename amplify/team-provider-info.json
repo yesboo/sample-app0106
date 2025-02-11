@@ -20,6 +20,12 @@
       },
       "storage": {
         "ampdev": {}
+      },
+      "function": {
+        "ampLambda": {
+          "deploymentBucketName": "amplify-amplifyapp-dev-e0bad-deployment",
+          "s3Key": "amplify-builds/ampLambda-374b6558384172364242-build.zip"
+        }
       }
     }
   }
